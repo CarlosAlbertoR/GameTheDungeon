@@ -20,8 +20,8 @@ var stage = [
     [0, 0, 2, 2, 2, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0],
     [0, 2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0],
     [0, 0, 2, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 2, 0],
-    [0, 2, 2, 2, 0, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0],
-    [0, 2, 2, 2, 0, 0, 2, 0, 0, 2, 2, 2, 2, 2, 0],
+    [0, 2, 2, 2, 0, 0, 2, 0, 0, 0, 1, 0, 0, 2, 0],
+    [0, 2, 2, 3, 0, 0, 2, 0, 0, 2, 2, 2, 2, 2, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
@@ -52,19 +52,17 @@ function drawStage() {
 }
 
 
-//PLAYER OBJECT
+//Player Object
 var Player = function() {
     this.x = 1;
     this.y = 1;
-
     this.color = '#820c01';
-
+    this.key = false;
 
     this.draw = function() {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x * widthF, this.y * heightF, widthF, heightF);
     }
-
 
     this.borders = function(x, y) {
         var collision = false;
@@ -76,27 +74,60 @@ var Player = function() {
         return (collision);
     }
 
-
-
     this.up = function() {
-        if (this.borders(this.x, this.y - 1) == false)
+        if (this.borders(this.x, this.y - 1) == false) {
             this.y--;
+            this.logicObjects();
+        }
     }
 
 
     this.down = function() {
-        if (this.borders(this.x, this.y + 1) == false)
+        if (this.borders(this.x, this.y + 1) == false) {
             this.y++;
+            this.logicObjects();
+        }
     }
 
     this.left = function() {
-        if (this.borders(this.x - 1, this.y) == false)
+        if (this.borders(this.x - 1, this.y) == false) {
             this.x--;
+            this.logicObjects();
+        }
     }
 
     this.right = function() {
-        if (this.borders(this.x + 1, this.y) == false)
+        if (this.borders(this.x + 1, this.y) == false) {
             this.x++;
+            this.logicObjects();
+        }
+    }
+
+    this.win = function() {
+        alert("Felicitaciones!!! \n Has ganado la partida.");
+        this.x = 1;
+        this.y = 1;
+        this.key = false;
+        stage[8][3] = 3;
+    }
+
+    this.logicObjects = function() {
+        var object = stage[this.y][this.x];
+
+        //Get key
+        if (object == 3) {
+            this.key = true;
+            stage[this.y][this.x] = 2;
+            console.log("You'd got the key!!!")
+        }
+
+        //Open door
+        if (object == 1) {
+            if (this.key == true)
+                this.win();
+            else
+                console.log("YOU DON'T HAVE THE KEY!")
+        }
     }
 
 }
