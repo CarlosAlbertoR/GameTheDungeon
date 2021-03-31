@@ -13,6 +13,8 @@ var keyCode = '#c6bc00';
 var player;
 var enemy = [];
 
+var torch = [];
+
 var tileMap;
 
 var stage = [
@@ -206,6 +208,33 @@ var Enemy = function(x, y) {
     }
 }
 
+//Torch Object
+var Torch = function(x, y) {
+    this.x = x;
+    this.y = y;
+
+    this.wait = 10;
+    this.count = 0
+    this.photogram = 0; //0-3
+
+    this.changePhotogram = function() {
+        if (this.photogram < 3)
+            this.photogram++;
+        else
+            this.photogram = 0;
+    }
+
+    this.draw = function() {
+        if (this.count < this.wait) {
+            this.count++;
+        } else {
+            this.count = 0;
+            this.changePhotogram();
+        }
+        ctx.drawImage(tileMap, this.photogram * 32, 64, 32, 32, this.x * widthF, this.y * heightF, widthF, heightF);
+    }
+}
+
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
@@ -215,6 +244,18 @@ function init() {
 
     //CREATE PLAYER
     player = new Player();
+
+    //CREATE TORCH
+    torch.push(new Torch(0, 0));
+    torch.push(new Torch(14, 0));
+    torch.push(new Torch(0, 9));
+    torch.push(new Torch(14, 9));
+    torch.push(new Torch(5, 6));
+    torch.push(new Torch(4, 8));
+    torch.push(new Torch(9, 7));
+    torch.push(new Torch(5, 1));
+    torch.push(new Torch(11, 2));
+    torch.push(new Torch(13, 5));
 
     //CREATE ENEMY
     enemy.push(new Enemy(6, 4));
@@ -257,5 +298,9 @@ function main() {
     for (i = 0; i < enemy.length; i++) {
         enemy[i].move();
         enemy[i].draw();
+    }
+
+    for (i = 0; i < torch.length; i++) {
+        torch[i].draw();
     }
 }
