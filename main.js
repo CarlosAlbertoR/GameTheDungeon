@@ -12,6 +12,8 @@ var keyCode = '#c6bc00';
 
 var player;
 
+var tileMap;
+
 var stage = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 2, 2, 0, 0, 0, 2, 2, 2, 2, 0, 0, 2, 2, 0],
@@ -26,29 +28,12 @@ var stage = [
 ]
 
 function drawStage() {
-    var color;
-
     for (y = 0; y < 10; y++) {
         for (x = 0; x < 15; x++) {
-
-            if (stage[y][x] == 0)
-                color = wall;
-
-            if (stage[y][x] == 1)
-                color = door;
-
-            if (stage[y][x] == 2)
-                color = earth;
-
-            if (stage[y][x] == 3)
-                color = keyCode;
-
-            ctx.fillStyle = color;
-            ctx.fillRect(x * widthF, y * heightF, widthF, heightF);
+            var tile = stage[y][x];
+            ctx.drawImage(tileMap, tile * 32, 0, 32, 32, widthF * x, heightF * y, widthF, heightF);
         }
     }
-
-
 }
 
 
@@ -60,8 +45,7 @@ var Player = function() {
     this.key = false;
 
     this.draw = function() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x * widthF, this.y * heightF, widthF, heightF);
+        ctx.drawImage(tileMap, 32, 32, 32, 32, this.x * widthF, this.y * heightF, widthF, heightF);
     }
 
     this.borders = function(x, y) {
@@ -140,6 +124,9 @@ var Player = function() {
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
+
+    tileMap = new Image();
+    tileMap.src = './img/tilemap.png';
 
     //CREATE PLAYER
     player = new Player();
