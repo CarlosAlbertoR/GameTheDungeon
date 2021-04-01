@@ -17,6 +17,11 @@ var torch = [];
 
 var tileMap;
 
+var music = [];
+var sounds = [];
+
+
+
 var stage = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 2, 2, 0, 0, 0, 2, 2, 2, 2, 0, 0, 2, 2, 0],
@@ -97,19 +102,28 @@ var Player = function() {
     this.win = function() {
         console.log('You win.')
         alert("Congratulations!!! \n You win the game.");
-        this.x = 1;
-        this.y = 1;
-        this.key = false;
-        stage[8][3] = 3;
+        this.resetGame();
     }
 
     this.death = function() {
         console.log('You was killed by a enemy :(')
+        sounds[2].sound.play();
         alert("Oh noo \n You was killed by a enemy :( \n  You lose.");
+        this.resetGame();
+    }
+
+    this.resetGame = function() {
         this.x = 1;
         this.y = 1;
         this.key = false;
         stage[8][3] = 3;
+        enemy = []
+
+        //CREATE ENEMIES
+        enemy.push(new Enemy(6, 3));
+        enemy.push(new Enemy(8, 1));
+        enemy.push(new Enemy(4, 4));
+        enemy.push(new Enemy(13, 8));
     }
 
     this.logicObjects = function() {
@@ -120,13 +134,15 @@ var Player = function() {
             this.key = true;
             stage[this.y][this.x] = 2;
             console.log("You've got the key!!!")
+            sounds[0].sound.play();
         }
 
         //Open door
         if (object == 1) {
-            if (this.key == true)
+            if (this.key == true) {
+                sounds[1].sound.play();
                 this.win();
-            else
+            } else
                 console.log("YOU DON'T HAVE THE KEY!")
         }
     }
@@ -235,12 +251,41 @@ var Torch = function(x, y) {
     }
 }
 
+//INITIALIZATION MUSIC
+var Music = function(srcSound) {
+    this.sound = new Howl({
+        src: [srcSound],
+        loop: true
+    })
+}
+
+//EffectSound Object
+var EffectSound = function(srcSound) {
+    this.sound = new Howl({
+        src: [srcSound],
+        loop: false
+    })
+}
+
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
 
+    //INITIALIZATION TILEMAP
     tileMap = new Image();
     tileMap.src = './img/tilemap.png';
+
+    //MUSIC INITIAL
+    music.push(new Music('./music/HeroicDemise.mp3'))
+    music.push(new Music('./music/Opening.ogg'))
+    music[1].sound.play()
+    console.log("Number of musics: " + music.length)
+
+    //EFFECT SOUNDS INITIAL
+    sounds.push(new EffectSound('./sound/key.mp3'))
+    sounds.push(new EffectSound('./sound/win.wav'))
+    sounds.push(new EffectSound('./sound/death.wav'))
+    console.log("Number of efffect sounds: " + sounds.length)
 
     //CREATE PLAYER
     player = new Player();
@@ -258,9 +303,7 @@ function init() {
     torch.push(new Torch(13, 5));
 
     //CREATE ENEMY
-    enemy.push(new Enemy(6, 4));
-    enemy.push(new Enemy(8, 2));
-    enemy.push(new Enemy(4, 4));
+    addEnemies();
 
     //KEYBOARD READ
     document.addEventListener('keydown', function(tecla) {
@@ -283,6 +326,13 @@ function init() {
     setInterval(function() {
         main();
     }, 1000 / FPS);
+}
+
+function addEnemies() {
+    enemy.push(new Enemy(6, 3));
+    enemy.push(new Enemy(8, 1));
+    enemy.push(new Enemy(4, 4));
+    enemy.push(new Enemy(13, 8));
 }
 
 function eraseCanvas() {
